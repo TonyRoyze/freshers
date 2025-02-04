@@ -1,12 +1,10 @@
 ---
-// import EventSelector from "./EventSelector.astro";
-// import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-// import EventTable from "./EventTable";
 import type { Event } from "../lib/types";
 import { EVENTS } from "../lib/constants";
 import Layout from "../layouts/Layout.astro";
-import FacultyTable from "../components/FacultyTable.astro";
+// import FacultyTable from "../components/FacultyTable.astro";
 import { supabase } from "../lib/supabase";
+import EventTable from "../components/EventTable.astro";
 
 // import { Columns4, Timer } from "lucide-react";
 // import Heats from "./Heats";
@@ -120,12 +118,49 @@ const initialWomenLanes = initialWomendata.reduce(
                         >
                     </div>
 
+                    <div
+                        class="absolute top-0 right-0 inline-flex justify-start bg-[var(--color-muted)]/60 rounded-lg p-1"
+                    >
+                        <input
+                            type="radio"
+                            id="tableView"
+                            name="views"
+                            value="Table"
+                            class="hidden peer/tableView"
+                            checked
+                        />
+                        <label
+                            for="tableView"
+                            class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/tableView:bg-white peer-checked/tableView:text-black transition-all"
+                            >Times</label
+                        >
+
+                        <input
+                            type="radio"
+                            id="heatView"
+                            name="views"
+                            value="Heats"
+                            class="hidden peer/heatView"
+                        />
+                        <label
+                            for="heatView"
+                            class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/heatView:bg-white peer-checked/heatView:text-black transition-all"
+                            >Heats</label
+                        >
+                    </div>
+
                     <div class="mt-4">
-                        <div id="menTable" class="hidden">
-                            <!-- <FacultyTable data={menPoints} /> -->
+                        <div id="menTable" class="block">
+                            <EventTable data={initialMendata} />
+                        </div>
+                        <div id="menHeats" class="hidden">
+                            <!-- <EventTable data={initialMendata} /> -->
                         </div>
                         <div id="womenTable" class="hidden">
-                            <!-- <FacultyTable data={womenPoints} /> -->
+                            <EventTable data={initialWomendata} />
+                        </div>
+                        <div id="womenHeats" class="hidden">
+                            <!-- <EventTable data={initialWomendata} /> -->
                         </div>
                     </div>
                 </div>
@@ -134,14 +169,26 @@ const initialWomenLanes = initialWomendata.reduce(
     </div>
     <script>
         const radios = document.querySelectorAll('input[name="tabs"]');
+        const viewRadios = document.querySelectorAll('input[name="views"]');
+
         const tables = {
             men: document.getElementById("menTable"),
             women: document.getElementById("womenTable"),
+            menHeats: document.getElementById("menHeats"),
+            womenHeats: document.getElementById("womenHeats"),
+        };
+
+        const views = {
+            mentable: document.getElementById("menTable"),
+            womentable: document.getElementById("womenTable"),
+            menheats: document.getElementById("menHeats"),
+            womenheats: document.getElementById("womenHeats"),
         };
 
         radios.forEach((radio) => {
             radio.addEventListener("change", (e) => {
                 const selected = (e.target as HTMLInputElement).value;
+                console.log(selected);
                 Object.entries(tables).forEach(([key, table]) => {
                     if (key === selected) {
                         table?.classList.remove("hidden");
@@ -149,6 +196,32 @@ const initialWomenLanes = initialWomendata.reduce(
                     } else {
                         table?.classList.remove("block");
                         table?.classList.add("hidden");
+                    }
+                });
+            });
+        });
+
+        viewRadios.forEach((radio) => {
+            radio.addEventListener("change", (e) => {
+                const selected = (
+                    e.target as HTMLInputElement
+                ).value.toLowerCase();
+                const currentGender = (
+                    document.querySelector(
+                        'input[name="tabs"]:checked',
+                    ) as HTMLInputElement
+                ).value;
+                console.log(selected, currentGender);
+
+                Object.entries(views).forEach(([key, view]) => {
+                    // Hide all views first
+                    view?.classList.remove("block");
+                    view?.classList.add("hidden");
+
+                    // Show the correct view based on current gender and view type
+                    if (key === `${currentGender}${selected}`) {
+                        view?.classList.remove("hidden");
+                        view?.classList.add("block");
                     }
                 });
             });
