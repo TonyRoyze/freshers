@@ -1,7 +1,7 @@
 ---
 // import EventCarousel from "../components/EventCarousel.astro";
 import Layout from "../layouts/Layout.astro";
-// import EventLeaderboard from "../components/EventLeaderboard.tsx";
+import FacultyLeaderboard from "../components/FacultyLeaderboard.astro";
 
 import { supabase } from "../lib/supabase";
 
@@ -17,8 +17,5 @@ if (error) {
 
 <Layout>
 	<!-- <EventCarousel results={data ?? []} client:load /> -->
-	<!-- <EventLeaderboard results={data ?? []} client:load /> -->
-	<ul>
-		{data && data.map((item) => <li>{item.name}</li>)}
-	</ul>
+	<FacultyLeaderboard results={data ?? []} client:load />
 </Layout>

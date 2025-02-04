@@ -1,0 +1,157 @@
+---
+import FacultyTable from "./FacultyTable.astro";
+import type { Points, Event } from "../lib/types";
+import { FACULTY_OPTIONS } from "../lib/constants";
+
+interface Props {
+    results: Event[];
+}
+
+const { results } = Astro.props;
+
+// Process overall points
+const overallPoints = FACULTY_OPTIONS.map((faculty) => ({
+    name: faculty.key,
+    points: results
+        .filter((item) => item.faculty_id === faculty.id)
+        .reduce((sum, item) => sum + (item.points || 0), 0),
+}))
+    .sort((a, b) => b.points - a.points)
+    .map((faculty, index, array) => ({
+        ...faculty,
+        rank:
+            index > 0 && faculty.points === array[index - 1].points
+                ? (array[index - 1] as Points).rank
+                : index + 1,
+    }));
+
+// Process men's points
+const menPoints = FACULTY_OPTIONS.map((faculty) => ({
+    name: faculty.key,
+    points: results
+        .filter(
+            (item) =>
+                item.faculty_id === faculty.id && (item.event_id ?? 0) > 16,
+        )
+        .reduce((sum, item) => sum + (item.points || 0), 0),
+}))
+    .sort((a, b) => b.points - a.points)
+    .map((faculty, index, array) => ({
+        ...faculty,
+        rank:
+            index > 0 && faculty.points === array[index - 1].points
+                ? (array[index - 1] as Points).rank
+                : index + 1,
+    }));
+
+// Process women's points
+const womenPoints = FACULTY_OPTIONS.map((faculty) => ({
+    name: faculty.key,
+    points: results
+        .filter(
+            (item) =>
+                item.faculty_id === faculty.id && (item.event_id ?? 0) <= 16,
+        )
+        .reduce((sum, item) => sum + (item.points || 0), 0),
+}))
+    .sort((a, b) => b.points - a.points)
+    .map((faculty, index, array) => ({
+        ...faculty,
+        rank:
+            index > 0 && faculty.points === array[index - 1].points
+                ? (array[index - 1] as Points).rank
+                : index + 1,
+    }));
+---
+
+<div class="flex flex-col">
+    <main
+        class="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3"
+    >
+        <div
+            class="flex h-full flex-col rounded-xl bg-[var(--color-muted)]/60 p-4 md:col-span-2"
+        >
+            <div class="relative">
+                <div
+                    class="inline-flex justify-start bg-[var(--color-muted)]/60 rounded-lg p-1"
+                >
+                    <input
+                        type="radio"
+                        id="overall"
+                        name="tabs"
+                        value="overall"
+                        class="hidden peer/overall"
+                        checked
+                    />
+                    <label
+                        for="overall"
+                        class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/overall:bg-white peer-checked/overall:text-black transition-all"
+                        >Overall</label
+                    >
+
+                    <input
+                        type="radio"
+                        id="men"
+                        name="tabs"
+                        value="men"
+                        class="hidden peer/men"
+                    />
+                    <label
+                        for="men"
+                        class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/men:bg-white peer-checked/men:text-black transition-all"
+                        >Men</label
+                    >
+
+                    <input
+                        type="radio"
+                        id="women"
+                        name="tabs"
+                        value="women"
+                        class="hidden peer/women"
+                    />
+                    <label
+                        for="women"
+                        class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/women:bg-white peer-checked/women:text-black transition-all"
+                        >Women</label
+                    >
+                </div>
+
+                <div class="mt-4">
+                    <div id="overallTable" class="block">
+                        <FacultyTable data={overallPoints} />
+                    </div>
+                    <div id="menTable" class="hidden">
+                        <FacultyTable data={menPoints} />
+                    </div>
+                    <div id="womenTable" class="hidden">
+                        <FacultyTable data={womenPoints} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const radios = document.querySelectorAll('input[name="tabs"]');
+    const tables = {
+        overall: document.getElementById("overallTable"),
+        men: document.getElementById("menTable"),
+        women: document.getElementById("womenTable"),
+    };
+
+    radios.forEach((radio) => {
+        radio.addEventListener("change", (e) => {
+            const selected = (e.target as HTMLInputElement).value;
+            Object.entries(tables).forEach(([key, table]) => {
+                if (key === selected) {
+                    table?.classList.remove("hidden");
+                    table?.classList.add("block");
+                } else {
+                    table?.classList.remove("block");
+                    table?.classList.add("hidden");
+                }
+            });
+        });
+    });
+</script>
