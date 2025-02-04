@@ -6,7 +6,9 @@ import { FACULTY_OPTIONS } from "../lib/constants";
 // import FacultyLeaderboard from "../components/FacultyLeaderboard.astro";
 
 import { supabase } from "../lib/supabase";
-
+let overallPoints: Points[] = [];
+let menPoints: Points[] = [];
+let womenPoints: Points[] = [];
 const { data, error } = await supabase
 	.from("swims")
 	.select("*")
@@ -15,7 +17,7 @@ const { data, error } = await supabase
 if (error) {
 	console.error("Error fetching events:", error);
 } else {
-	const overallPoints = FACULTY_OPTIONS.map((faculty) => ({
+	overallPoints = FACULTY_OPTIONS.map((faculty) => ({
 		name: faculty.key,
 		points: data
 			.filter((item) => item.faculty_id === faculty.id)
@@ -31,7 +33,7 @@ if (error) {
 		}));
 
 	// Process men's points
-	const menPoints = FACULTY_OPTIONS.map((faculty) => ({
+	menPoints = FACULTY_OPTIONS.map((faculty) => ({
 		name: faculty.key,
 		points: data
 			.filter(
@@ -50,7 +52,7 @@ if (error) {
 		}));
 
 	// Process women's points
-	const womenPoints = FACULTY_OPTIONS.map((faculty) => ({
+	womenPoints = FACULTY_OPTIONS.map((faculty) => ({
 		name: faculty.key,
 		points: data
 			.filter(
@@ -152,8 +154,8 @@ if (error) {
 									</thead>
 									<tbody class="[&_tr:last-child]:border-0">
 										{
-											data &&
-												data
+											overallPoints &&
+												overallPoints
 													.filter(
 														(faculty) =>
 															faculty.points > 0,
