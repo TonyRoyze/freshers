@@ -1,25 +1,20 @@
 ---
 import type { Event } from "../lib/types";
-import { EVENTS } from "../lib/constants";
+import { EVENT_OPTIONS, EVENTS } from "../lib/constants";
 import Layout from "../layouts/Layout.astro";
-// import FacultyTable from "../components/FacultyTable.astro";
 import { supabase } from "../lib/supabase";
 import EventTable from "../components/EventTable.astro";
+import HeatTable from "../components/HeatTable.astro";
 
-// import { Columns4, Timer } from "lucide-react";
-// import Heats from "./Heats";
-
-const { data, error } = await supabase
-    .from("swims")
-    .select("*")
-    .order("time", { ascending: true });
+const { data, error } = await supabase.from("swims").select("*");
 
 if (error) {
     console.error("Error fetching events:", error);
 }
 
-// Initial data processing
-const initialEvent = "100free";
+// Get event from URL parameters, default to "25free" if not specified
+const initialEvent =
+    new URL(Astro.request.url).searchParams.get("event") || "25free";
 const sortedData = (data || []).sort((a, b) => {
     const timeA = a.time
         .split(":")
@@ -86,6 +81,25 @@ const initialWomenLanes = initialWomendata.reduce(
             <div
                 class="flex h-full flex-col rounded-xl bg-[var(--color-muted)]/60 p-4 md:col-span-2"
             >
+                <div class="mb-4">
+                    <select
+                        id="eventSelector"
+                        class="w-full h-10 rounded-lg bg-[var(--color-muted)]/60 px-3 py-2 text-sm appearance-none"
+                    >
+                        {
+                            EVENT_OPTIONS.map((event) =>
+                                event.items.map((item) => (
+                                    <option
+                                        value={item.value}
+                                        selected={item.value === initialEvent}
+                                    >
+                                        {item.label}
+                                    </option>
+                                )),
+                            )
+                        }
+                    </select>
+                </div>
                 <div class="relative">
                     <div
                         class="inline-flex justify-start bg-[var(--color-muted)]/60 rounded-lg p-1"
@@ -125,7 +139,7 @@ const initialWomenLanes = initialWomendata.reduce(
                             type="radio"
                             id="tableView"
                             name="views"
-                            value="Table"
+                            value="table"
                             class="hidden peer/tableView"
                             checked
                         />
@@ -139,7 +153,7 @@ const initialWomenLanes = initialWomendata.reduce(
                             type="radio"
                             id="heatView"
                             name="views"
-                            value="Heats"
+                            value="heats"
                             class="hidden peer/heatView"
                         />
                         <label
@@ -150,17 +164,17 @@ const initialWomenLanes = initialWomendata.reduce(
                     </div>
 
                     <div class="mt-4">
-                        <div id="menTable" class="block">
+                        <div id="mentable" class="block">
                             <EventTable data={initialMendata} />
                         </div>
-                        <div id="menHeats" class="hidden">
-                            <!-- <EventTable data={initialMendata} /> -->
+                        <div id="menheats" class="hidden">
+                            <HeatTable results={initialMenLanes} />
                         </div>
-                        <div id="womenTable" class="hidden">
+                        <div id="womentable" class="hidden">
                             <EventTable data={initialWomendata} />
                         </div>
-                        <div id="womenHeats" class="hidden">
-                            <!-- <EventTable data={initialWomendata} /> -->
+                        <div id="womenheats" class="hidden">
+                            <HeatTable results={initialWomenLanes} />
                         </div>
                     </div>
                 </div>
@@ -172,30 +186,40 @@ const initialWomenLanes = initialWomendata.reduce(
         const viewRadios = document.querySelectorAll('input[name="views"]');
 
         const tables = {
-            men: document.getElementById("menTable"),
-            women: document.getElementById("womenTable"),
-            menHeats: document.getElementById("menHeats"),
-            womenHeats: document.getElementById("womenHeats"),
+            men: document.getElementById("mentable"),
+            women: document.getElementById("womentable"),
+            menheats: document.getElementById("menheats"),
+            womenheats: document.getElementById("womenheats"),
         };
 
         const views = {
-            mentable: document.getElementById("menTable"),
-            womentable: document.getElementById("womenTable"),
-            menheats: document.getElementById("menHeats"),
-            womenheats: document.getElementById("womenHeats"),
+            mentable: document.getElementById("mentable"),
+            womentable: document.getElementById("womentable"),
+            menheats: document.getElementById("menheats"),
+            womenheats: document.getElementById("womenheats"),
         };
 
         radios.forEach((radio) => {
             radio.addEventListener("change", (e) => {
-                const selected = (e.target as HTMLInputElement).value;
-                console.log(selected);
-                Object.entries(tables).forEach(([key, table]) => {
-                    if (key === selected) {
-                        table?.classList.remove("hidden");
-                        table?.classList.add("block");
-                    } else {
-                        table?.classList.remove("block");
-                        table?.classList.add("hidden");
+                const selected = (
+                    e.target as HTMLInputElement
+                ).value.toLowerCase();
+                const currentView = (
+                    document.querySelector(
+                        'input[name="views"]:checked',
+                    ) as HTMLInputElement
+                ).value;
+                console.log(selected, currentView);
+
+                Object.entries(views).forEach(([key, view]) => {
+                    // Hide all views first
+                    view?.classList.remove("block");
+                    view?.classList.add("hidden");
+
+                    // Show the correct view based on current gender and view type
+                    if (key === `${selected}${currentView}`) {
+                        view?.classList.remove("hidden");
+                        view?.classList.add("block");
                     }
                 });
             });
@@ -225,6 +249,20 @@ const initialWomenLanes = initialWomendata.reduce(
                     }
                 });
             });
+        });
+
+        // Add event selector logic
+        const eventSelector = document.getElementById(
+            "eventSelector",
+        ) as HTMLSelectElement;
+
+        eventSelector.addEventListener("change", async () => {
+            const selectedEvent = eventSelector.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set("event", selectedEvent);
+            window.history.pushState({}, "", url);
+            // Refresh the page to update the data
+            window.location.reload();
         });
     </script>
 </Layout>

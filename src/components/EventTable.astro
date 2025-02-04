@@ -17,27 +17,27 @@ const { data } = Astro.props;
             >
                 <th
                     scope="col"
-                    class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+                    class="px-2 text-xs md:text-lg md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Rank</th
                 >
                 <th
                     scope="col"
-                    class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+                    class="px-2 text-xs md:text-lg md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Faculty</th
                 >
                 <th
                     scope="col"
-                    class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+                    class="px-2 text-xs md:text-lg md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Name</th
                 >
                 <th
                     scope="col"
-                    class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+                    class="px-2 text-xs md:text-lg md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Time</th
                 >
                 <th
                     scope="col"
-                    class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+                    class="px-2 text-xs md:text-lg md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Points</th
                 >
             </tr>
@@ -46,11 +46,11 @@ const { data } = Astro.props;
             {
                 data.map((event, index) => (
                     <tr class="border-[var(--color-border)] transition-colors hover:bg-[var(--color-background)]/50">
-                        <td class="px-3 text-sm justify-center md:text-sm py-4 align-middle">
+                        <td class="px-3 text-sm justify-center md:text-lg py-4 align-middle">
                             {index + 1}
                         </td>
                         <td class="px-2 md:px-3 py-4 align-middle">
-                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-xs md:text-sm border-transparent bg-[var(--color-secondary)] text-secondary-foreground hover:bg-[var(--color-secondary)]/80">
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-xs md:text-lg border-transparent bg-[var(--color-secondary)] text-secondary-foreground hover:bg-[var(--color-secondary)]/80">
                                 {
                                     FACULTY_OPTIONS.find(
                                         (faculty) =>
@@ -59,16 +59,16 @@ const { data } = Astro.props;
                                 }
                             </span>
                         </td>
-                        <td class="hidden lg:table-cell px-2 text-sm justify-center md:text-sm py-4 align-middle">
+                        <td class="hidden md:table-cell px-2 text-sm justify-center md:text-lg py-4 align-middle">
                             {event.name}
                         </td>
-                        <td class="lg:hidden px-2 text-sm justify-center md:text-sm py-4 align-middle">
+                        <td class="md:hidden px-2 text-sm justify-center md:text-lg py-4 align-middle">
                             {event.name.split(" ")[0]}
                         </td>
-                        <td class="px-2 text-sm justify-center md:text-sm py-4 align-middle">
+                        <td class="px-2 text-sm justify-center md:text-lg py-4 align-middle">
                             {event.time}
                         </td>
-                        <td class="px-3 py-4 text-xs md:text-sm md:px-3 md:text-sm align-middle">
+                        <td class="px-3 py-4 text-xs md:text-lg md:px-3 md:text-lg align-middle">
                             {event.points ? event.points / 10 : "-"}
                         </td>
                     </tr>
