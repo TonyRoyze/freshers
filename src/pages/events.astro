@@ -1,0 +1,157 @@
+---
+// import EventSelector from "./EventSelector.astro";
+// import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
+// import EventTable from "./EventTable";
+import type { Event } from "../lib/types";
+import { EVENTS } from "../lib/constants";
+import Layout from "../layouts/Layout.astro";
+import FacultyTable from "../components/FacultyTable.astro";
+import { supabase } from "../lib/supabase";
+
+// import { Columns4, Timer } from "lucide-react";
+// import Heats from "./Heats";
+
+const { data, error } = await supabase
+    .from("swims")
+    .select("*")
+    .order("time", { ascending: true });
+
+if (error) {
+    console.error("Error fetching events:", error);
+}
+
+// Initial data processing
+const initialEvent = "100free";
+const sortedData = (data || []).sort((a, b) => {
+    const timeA = a.time
+        .split(":")
+        .reduce(
+            (acc: number, time: string) => acc * 60 + Number.parseFloat(time),
+            0,
+        );
+    const timeB = b.time
+        .split(":")
+        .reduce(
+            (acc: number, time: string) => acc * 60 + Number.parseFloat(time),
+            0,
+        );
+    return timeA - timeB;
+});
+
+const menEventId = EVENTS.find((event) => event.key === `M${initialEvent}`)?.id;
+const womenEventId = EVENTS.find(
+    (event) => event.key === `W${initialEvent}`,
+)?.id;
+
+const initialMendata = sortedData.filter(
+    (item) => item.event_id === menEventId,
+);
+const initialWomendata = sortedData.filter(
+    (item) => item.event_id === womenEventId,
+);
+
+// Process initial lanes data
+const initialMenLanes = initialMendata.reduce(
+    (acc, item) => {
+        const heat = item.heat || 1;
+        if (!acc[heat]) {
+            acc[heat] = {};
+        }
+        if (item.lane !== undefined) {
+            acc[heat][item.lane] = item;
+        }
+        return acc;
+    },
+    {} as Record<number, Record<number, Event>>,
+);
+
+const initialWomenLanes = initialWomendata.reduce(
+    (acc, item) => {
+        const heat = item.heat || 1;
+        if (!acc[heat]) {
+            acc[heat] = {};
+        }
+        if (item.lane !== undefined) {
+            acc[heat][item.lane] = item;
+        }
+        return acc;
+    },
+    {} as Record<number, Record<number, Event>>,
+);
+---
+
+<Layout>
+    <div class="flex flex-col">
+        <main
+            class="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3"
+        >
+            <div
+                class="flex h-full flex-col rounded-xl bg-[var(--color-muted)]/60 p-4 md:col-span-2"
+            >
+                <div class="relative">
+                    <div
+                        class="inline-flex justify-start bg-[var(--color-muted)]/60 rounded-lg p-1"
+                    >
+                        <input
+                            type="radio"
+                            id="men"
+                            name="tabs"
+                            value="men"
+                            class="hidden peer/men"
+                            checked
+                        />
+                        <label
+                            for="men"
+                            class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/men:bg-white peer-checked/men:text-black transition-all"
+                            >Men</label
+                        >
+
+                        <input
+                            type="radio"
+                            id="women"
+                            name="tabs"
+                            value="women"
+                            class="hidden peer/women"
+                        />
+                        <label
+                            for="women"
+                            class="text-xs md:text-sm px-3 py-1.5 cursor-pointer rounded-md peer-checked/women:bg-white peer-checked/women:text-black transition-all"
+                            >Women</label
+                        >
+                    </div>
+
+                    <div class="mt-4">
+                        <div id="menTable" class="hidden">
+                            <!-- <FacultyTable data={menPoints} /> -->
+                        </div>
+                        <div id="womenTable" class="hidden">
+                            <!-- <FacultyTable data={womenPoints} /> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        const radios = document.querySelectorAll('input[name="tabs"]');
+        const tables = {
+            men: document.getElementById("menTable"),
+            women: document.getElementById("womenTable"),
+        };
+
+        radios.forEach((radio) => {
+            radio.addEventListener("change", (e) => {
+                const selected = (e.target as HTMLInputElement).value;
+                Object.entries(tables).forEach(([key, table]) => {
+                    if (key === selected) {
+                        table?.classList.remove("hidden");
+                        table?.classList.add("block");
+                    } else {
+                        table?.classList.remove("block");
+                        table?.classList.add("hidden");
+                    }
+                });
+            });
+        });
+    </script>
+</Layout>

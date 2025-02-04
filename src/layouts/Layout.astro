@@ -1,7 +1,9 @@
 ---
 import background from "../assets/background2.png";
+import background2 from "../assets/background.png";
 import Image from "astro/components/Image.astro";
 import "../styles/global.css";
+import EventCarousel from "../components/EventCarousel.astro";
 ---
 
 <!doctype html>
@@ -16,14 +18,22 @@ import "../styles/global.css";
 	<body class="mx-auto max-w-[1440px]">
 		<Image
 			src={background}
-			alt=""
-			class="fixed top-0 left-0 w-full h-full -z-10"
+			alt="background"
+			class="fixed md:hidden top-0 left-0 w-full h-full -z-10"
+			loading="eager"
+			fetchpriority="high"
+		/>
+		<Image
+			src={background2}
+			alt="background"
+			class="hidden md:block fixed top-0 left-0 w-full h-full -z-10"
 			loading="eager"
 			fetchpriority="high"
 		/>
 		<div class="lg:grid lg:grid-cols-5 lg:flex-row h-full" id="container">
 			<!-- <Navigation /> -->
 			<main class="lg:col-span-4 p-6">
+				<EventCarousel />
 				<slot />
 			</main>
 		</div>
