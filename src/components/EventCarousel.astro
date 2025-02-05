@@ -1,0 +1,290 @@
+---
+import { FACULTY_OPTIONS } from "../lib/constants";
+import type { Points, Event } from "../lib/types";
+import { supabase } from "../lib/supabase";
+let overallPoints: Points[] = [];
+
+interface EventArray {
+    id: number;
+    title: string;
+    date: string;
+    description: string;
+    sport: string;
+    location: string;
+}
+
+const EVENTS: EventArray[] = [
+    {
+        id: 1,
+        title: "Freshers Swimming Champoinship",
+        date: "Feb 8",
+        description: "Annual summer sports competition",
+        sport: "Swimming",
+        location: "Thustan Swimming Pool",
+    },
+];
+
+const SPORTS = ["All", "Swimming"];
+
+const { data, error } = await supabase.from("swims").select("*");
+
+if (error) {
+    console.error("Error fetching events:", error);
+} else {
+    overallPoints = FACULTY_OPTIONS.map((faculty) => ({
+        name: faculty.key,
+        points: data
+            .filter((item) => item.faculty_id === faculty.id)
+            .reduce((sum, item) => sum + (item.points || 0), 0),
+    }))
+        .sort((a, b) => b.points - a.points)
+        .map((faculty, index, array) => ({
+            ...faculty,
+            rank:
+                index > 0 && faculty.points === array[index - 1].points
+                    ? (array[index - 1] as Points).rank
+                    : index + 1,
+        }));
+}
+---
+
+<div class="flex flex-row items-stretch">
+    <div class="relative inline-block text-left">
+        <button
+            id="filterButton"
+            class="h-full p-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] hover:bg-gray-200 transition-colors"
+            aria-label="Select Sport"
+        >
+            <!-- <SlidersVertical className="w-6 h-6" /> -->
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-sliders-vertical"
+                ><line x1="4" x2="4" y1="21" y2="14"></line><line
+                    x1="4"
+                    x2="4"
+                    y1="10"
+                    y2="3"></line><line x1="12" x2="12" y1="21" y2="12"
+                ></line><line x1="12" x2="12" y1="8" y2="3"></line><line
+                    x1="20"
+                    x2="20"
+                    y1="21"
+                    y2="16"></line><line x1="20" x2="20" y1="12" y2="3"
+                ></line><line x1="2" x2="6" y1="14" y2="14"></line><line
+                    x1="10"
+                    x2="14"
+                    y1="8"
+                    y2="8"></line><line x1="18" x2="22" y1="16" y2="16"
+                ></line></svg
+            >
+        </button>
+        <div
+            id="filterDropdown"
+            class="hidden absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-[var(--color-background)] ring-1 ring-black ring-opacity-5"
+        >
+            <ul class="py-1">
+                {
+                    SPORTS.map((sport) => (
+                        <li
+                            data-sport={sport}
+                            class="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-200"
+                        >
+                            {sport}
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div
+        class="w-full max-w-5xl overflow-x-auto md:overflow-hidden mx-4 snap-x snap-mandatory scrollbar-hide"
+    >
+        <div
+            id="carouselContainer"
+            class="flex transition-transform duration-300 ease-in-out"
+        >
+            {
+                EVENTS.map((event) => (
+                    <div class="relative flex-none w-full md:w-1/2 pr-2 snap-center">
+                        <a href="/events">
+                            <div class="bg-[var(--color-background)] p-6 pb-2 rounded-lg border border-[var(--color-border)] h-full">
+                                <p class="text-sm md:text-lg font-bold text-gray-800 mb-1">
+                                    {event.date}
+                                </p>
+                                <h3 class="text-xs md:text-lg font-medium text-gray-800 mb-1">
+                                    {event.title}
+                                </h3>
+                                <div class="flex items-center mb-1">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="15"
+                                        height="15"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-map-pin"
+                                    >
+                                        <>
+                                            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                                            <circle cx="12" cy="10" r="3" />
+                                        </>
+                                    </svg>
+                                    <span class="ml-2 text-xs md:text-sm font-thin">
+                                        {event.location}
+                                    </span>
+                                </div>
+                                {overallPoints.length >= 3 && (
+                                    <div class="flex justify-end w-full">
+                                        <p class="text-lg mr-2">
+                                            🏆{" "}
+                                            <span class="text-sm font-bold">
+                                                {overallPoints[0].name}
+                                            </span>
+                                        </p>
+                                        <p class="text-lg mr-2">
+                                            🥈{" "}
+                                            <span class="text-sm font-bold">
+                                                {overallPoints[1].name}
+                                            </span>
+                                        </p>
+                                        <p class="text-lg">
+                                            🥉{" "}
+                                            <span class="text-sm font-bold">
+                                                {overallPoints[2].name}
+                                            </span>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </a>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+
+    <div class="hidden md:flex flex-col gap-1 mx-4">
+        <button
+            id="prevButton"
+            class="p-2 h-1/2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Previous events"
+        >
+            <!-- <ChevronLeft className="w-4 h-4" /> -->
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-chevron-left"
+                ><path d="m15 18-6-6 6-6"></path></svg
+            >
+        </button>
+        <button
+            id="nextButton"
+            class="p-2 h-1/2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Next events"
+        >
+            <!-- <ChevronRight className="w-4 h-4" /> -->
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-chevron-right"
+                ><path d="m9 18 6-6-6-6"></path></svg
+            >
+        </button>
+    </div>
+
+    <button
+        class="p-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="View Leaderboard"
+        onclick="window.location.href='/'"
+    >
+        <!-- <ChartNoAxesColumn className="w-6 h-6" /> -->
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-chart-no-axes-column"
+            ><line x1="18" x2="18" y1="20" y2="10"></line><line
+                x1="12"
+                x2="12"
+                y1="20"
+                y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line></svg
+        >
+    </button>
+</div>
+
+<script>
+    import { EVENTS } from "../lib/constants";
+
+    const filterButton = document.getElementById("filterButton");
+    const filterDropdown = document.getElementById("filterDropdown");
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+    const carouselContainer = document.getElementById("carouselContainer");
+
+    let currentIndex = 0;
+    const cardsToShow = 3;
+    const maxIndex = Math.max(0, EVENTS.length - cardsToShow);
+
+    filterButton?.addEventListener("click", () => {
+        filterDropdown?.classList.toggle("hidden");
+    });
+
+    prevButton?.addEventListener("click", () => {
+        currentIndex = Math.max(0, currentIndex - 1);
+        updateCarouselPosition();
+    });
+
+    nextButton?.addEventListener("click", () => {
+        currentIndex = Math.min(maxIndex, currentIndex + 1);
+        updateCarouselPosition();
+    });
+
+    function updateCarouselPosition() {
+        if (carouselContainer) {
+            carouselContainer.style.transform = `translateX(-${currentIndex * (100 / cardsToShow)}%)`;
+        }
+        updateButtonStates();
+    }
+
+    function updateButtonStates() {
+        if (prevButton)
+            (prevButton as HTMLButtonElement).disabled = currentIndex === 0;
+        if (nextButton)
+            (nextButton as HTMLButtonElement).disabled =
+                currentIndex === maxIndex;
+    }
+
+    // Initial button states
+    updateButtonStates();
+</script>

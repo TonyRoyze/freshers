@@ -1,0 +1,268 @@
+---
+import type { Event } from "../lib/types";
+import { EVENT_OPTIONS, EVENTS } from "../lib/constants";
+import Layout from "../layouts/Layout.astro";
+import { supabase } from "../lib/supabase";
+import EventTable from "../components/EventTable.astro";
+import HeatTable from "../components/HeatTable.astro";
+
+const { data, error } = await supabase.from("swims").select("*");
+
+if (error) {
+    console.error("Error fetching events:", error);
+}
+
+// Get event from URL parameters, default to "25free" if not specified
+const initialEvent =
+    new URL(Astro.request.url).searchParams.get("event") || "25free";
+const sortedData = (data || []).sort((a, b) => {
+    const timeA = a.time
+        .split(":")
+        .reduce(
+            (acc: number, time: string) => acc * 60 + Number.parseFloat(time),
+            0,
+        );
+    const timeB = b.time
+        .split(":")
+        .reduce(
+            (acc: number, time: string) => acc * 60 + Number.parseFloat(time),
+            0,
+        );
+    return timeA - timeB;
+});
+
+const menEventId = EVENTS.find((event) => event.key === `M${initialEvent}`)?.id;
+const womenEventId = EVENTS.find(
+    (event) => event.key === `W${initialEvent}`,
+)?.id;
+
+const initialMendata = sortedData.filter(
+    (item) => item.event_id === menEventId,
+);
+const initialWomendata = sortedData.filter(
+    (item) => item.event_id === womenEventId,
+);
+
+// Process initial lanes data
+const initialMenLanes = initialMendata.reduce(
+    (acc, item) => {
+        const heat = item.heat || 1;
+        if (!acc[heat]) {
+            acc[heat] = {};
+        }
+        if (item.lane !== undefined) {
+            acc[heat][item.lane] = item;
+        }
+        return acc;
+    },
+    {} as Record<number, Record<number, Event>>,
+);
+
+const initialWomenLanes = initialWomendata.reduce(
+    (acc, item) => {
+        const heat = item.heat || 1;
+        if (!acc[heat]) {
+            acc[heat] = {};
+        }
+        if (item.lane !== undefined) {
+            acc[heat][item.lane] = item;
+        }
+        return acc;
+    },
+    {} as Record<number, Record<number, Event>>,
+);
+---
+
+<Layout>
+    <div class="flex flex-col">
+        <main
+            class="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3"
+        >
+            <div
+                class="flex h-full flex-col rounded-xl bg-[var(--color-muted)]/60 p-4 md:col-span-2"
+            >
+                <div class="mb-4">
+                    <select
+                        id="eventSelector"
+                        class="w-full h-10 rounded-lg bg-[var(--color-muted)]/60 px-3 py-2 text-xs appearance-none"
+                    >
+                        {
+                            EVENT_OPTIONS.map((event) =>
+                                event.items.map((item) => (
+                                    <option
+                                        value={item.value}
+                                        selected={item.value === initialEvent}
+                                    >
+                                        {item.label}
+                                    </option>
+                                )),
+                            )
+                        }
+                    </select>
+                </div>
+                <div class="relative">
+                    <div
+                        class="inline-flex justify-start bg-[var(--color-muted)]/60 rounded-lg p-1"
+                    >
+                        <input
+                            type="radio"
+                            id="men"
+                            name="tabs"
+                            value="men"
+                            class="hidden peer/men"
+                            checked
+                        />
+                        <label
+                            for="men"
+                            class="text-xs md:text-xs px-3 py-1.5 cursor-pointer rounded-md peer-checked/men:bg-white peer-checked/men:text-black transition-all"
+                            >Men</label
+                        >
+
+                        <input
+                            type="radio"
+                            id="women"
+                            name="tabs"
+                            value="women"
+                            class="hidden peer/women"
+                        />
+                        <label
+                            for="women"
+                            class="text-xs md:text-md px-3 py-1.5 cursor-pointer rounded-md peer-checked/women:bg-white peer-checked/women:text-black transition-all"
+                            >Women</label
+                        >
+                    </div>
+
+                    <div
+                        class="absolute top-0 right-0 inline-flex justify-start bg-[var(--color-muted)]/60 rounded-lg p-1"
+                    >
+                        <input
+                            type="radio"
+                            id="tableView"
+                            name="views"
+                            value="table"
+                            class="hidden peer/tableView"
+                            checked
+                        />
+                        <label
+                            for="tableView"
+                            class="text-xs md:text-md px-3 py-1.5 cursor-pointer rounded-md peer-checked/tableView:bg-white peer-checked/tableView:text-black transition-all"
+                            >Times</label
+                        >
+
+                        <input
+                            type="radio"
+                            id="heatView"
+                            name="views"
+                            value="heats"
+                            class="hidden peer/heatView"
+                        />
+                        <label
+                            for="heatView"
+                            class="text-xs md:text-md px-3 py-1.5 cursor-pointer rounded-md peer-checked/heatView:bg-white peer-checked/heatView:text-black transition-all"
+                            >Heats</label
+                        >
+                    </div>
+
+                    <div class="mt-4">
+                        <div id="mentable" class="block">
+                            <EventTable data={initialMendata} />
+                        </div>
+                        <div id="menheats" class="hidden">
+                            <HeatTable results={initialMenLanes} />
+                        </div>
+                        <div id="womentable" class="hidden">
+                            <EventTable data={initialWomendata} />
+                        </div>
+                        <div id="womenheats" class="hidden">
+                            <HeatTable results={initialWomenLanes} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        const radios = document.querySelectorAll('input[name="tabs"]');
+        const viewRadios = document.querySelectorAll('input[name="views"]');
+
+        const tables = {
+            men: document.getElementById("mentable"),
+            women: document.getElementById("womentable"),
+            menheats: document.getElementById("menheats"),
+            womenheats: document.getElementById("womenheats"),
+        };
+
+        const views = {
+            mentable: document.getElementById("mentable"),
+            womentable: document.getElementById("womentable"),
+            menheats: document.getElementById("menheats"),
+            womenheats: document.getElementById("womenheats"),
+        };
+
+        radios.forEach((radio) => {
+            radio.addEventListener("change", (e) => {
+                const selected = (
+                    e.target as HTMLInputElement
+                ).value.toLowerCase();
+                const currentView = (
+                    document.querySelector(
+                        'input[name="views"]:checked',
+                    ) as HTMLInputElement
+                ).value;
+                console.log(selected, currentView);
+
+                Object.entries(views).forEach(([key, view]) => {
+                    // Hide all views first
+                    view?.classList.remove("block");
+                    view?.classList.add("hidden");
+
+                    // Show the correct view based on current gender and view type
+                    if (key === `${selected}${currentView}`) {
+                        view?.classList.remove("hidden");
+                        view?.classList.add("block");
+                    }
+                });
+            });
+        });
+
+        viewRadios.forEach((radio) => {
+            radio.addEventListener("change", (e) => {
+                const selected = (
+                    e.target as HTMLInputElement
+                ).value.toLowerCase();
+                const currentGender = (
+                    document.querySelector(
+                        'input[name="tabs"]:checked',
+                    ) as HTMLInputElement
+                ).value;
+                console.log(selected, currentGender);
+
+                Object.entries(views).forEach(([key, view]) => {
+                    // Hide all views first
+                    view?.classList.remove("block");
+                    view?.classList.add("hidden");
+
+                    // Show the correct view based on current gender and view type
+                    if (key === `${currentGender}${selected}`) {
+                        view?.classList.remove("hidden");
+                        view?.classList.add("block");
+                    }
+                });
+            });
+        });
+
+        // Add event selector logic
+        const eventSelector = document.getElementById(
+            "eventSelector",
+        ) as HTMLSelectElement;
+
+        eventSelector.addEventListener("change", async () => {
+            const selectedEvent = eventSelector.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set("event", selectedEvent);
+            window.history.pushState({}, "", url);
+            // Refresh the page to update the data
+            window.location.reload();
+        });
+    </script>
+</Layout>
