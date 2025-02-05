@@ -35,7 +35,7 @@ const { data } = Astro.props;
             {
                 data.map((faculty) => (
                     <tr class="border-[var(--color-border)] transition-colors hover:bg-[var(--color-background)]/50">
-                        <td class="px-3 text-sm justify-center md:text-sm py-4 align-middle">
+                        <td class="px-3 text-xs justify-center md:text-sm py-4 align-middle">
                             {faculty.rank === 1 ? (
                                 <span class="text-3xl">🥇</span>
                             ) : faculty.rank === 2 ? (
