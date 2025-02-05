@@ -11,7 +11,7 @@ import EventCarousel from "../components/EventCarousel.astro";
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/ico+xml" href="../assets/college.png" />
+		<link rel="icon" type="image/png+xml" href="../assets/college.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Freshers Championship</title>
 	</head>
@@ -36,6 +36,34 @@ import EventCarousel from "../components/EventCarousel.astro";
 				<EventCarousel />
 				<slot />
 			</main>
+			<footer
+				class="fixed bottom-0 left-0 w-full bg-[var(--color-muted)]/60 backdrop-blur-sm p-4"
+			>
+				<div
+					class="max-w-[1440px] mx-auto flex justify-between items-center text-sm"
+				>
+					<div>
+						<a
+							href="https://instagram.com/fresherschampionship"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="hover:text-white transition-colors"
+						>
+							Follow us on Instagram
+						</a>
+					</div>
+					<div>
+						<a
+							href="https://github.com/viduraakalanka/whole-wavelength"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="hover:text-white transition-colors"
+						>
+							⭐ Star on GitHub
+						</a>
+					</div>
+				</div>
+			</footer>
 		</div>
 	</body>
 </html>
