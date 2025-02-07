@@ -4,12 +4,15 @@ import background2 from "../assets/background.png";
 import Image from "astro/components/Image.astro";
 import "../styles/global.css";
 import EventCarousel from "../components/EventCarousel.astro";
+
+import PromoCompact from "../components/PromoCompact.astro";
 ---
 
 <!doctype html>
 <html lang="en" class="h-full w-full m-0">
 	<head>
 		<meta charset="UTF-8" />
+		<meta name="theme-color" content="#483E81" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/png+xml" href="../assets/college.png" />
 		<meta name="generator" content={Astro.generator} />
@@ -30,21 +33,24 @@ import EventCarousel from "../components/EventCarousel.astro";
 			loading="eager"
 			fetchpriority="high"
 		/>
-		<div class="lg:grid lg:grid-cols-5 lg:flex-row h-full" id="container">
+		<div class="min-h-dvh relative" id="container">
 			<!-- <Navigation /> -->
-			<main class="lg:col-span-4 p-6">
+			<main class="min-h-dvh p-6">
 				<EventCarousel />
+				<div id="promoContainer" class="mt-2 w-full justify-center">
+					<PromoCompact />
+				</div>
 				<slot />
 			</main>
 			<footer
-				class="fixed bottom-0 left-0 w-full bg-[var(--color-muted)]/60 backdrop-blur-sm p-4"
+				class="w-full bg-[var(--color-muted)]/60 backdrop-blur-sm p-4"
 			>
 				<div
 					class="max-w-[1440px] mx-auto flex justify-between items-center text-sm"
 				>
 					<div>
 						<a
-							href="https://instagram.com/fresherschampionship"
+							href="https://www.instagram.com/uoc_swimming/"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="hover:text-white transition-colors"
@@ -54,7 +60,7 @@ import EventCarousel from "../components/EventCarousel.astro";
 					</div>
 					<div>
 						<a
-							href="https://github.com/viduraakalanka/whole-wavelength"
+							href="https://github.com/TonyRoyze/freshers"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="hover:text-white transition-colors"
@@ -65,5 +71,47 @@ import EventCarousel from "../components/EventCarousel.astro";
 				</div>
 			</footer>
 		</div>
+		<script>
+			const showPromo = () => {
+				const promoContainer =
+					document.getElementById("promoContainer");
+				if (!promoContainer) return;
+
+				// Show promo
+				promoContainer.classList.remove("hidden");
+				promoContainer.style.opacity = "0";
+				promoContainer.style.transform = "translateY(20px)";
+
+				// Fade in animation
+				setTimeout(() => {
+					promoContainer.style.transition = "all 0.5s ease";
+					promoContainer.style.opacity = "1";
+					promoContainer.style.transform = "translateY(0)";
+				}, 100);
+
+				// Hide after 10 seconds
+				setTimeout(() => {
+					promoContainer.style.opacity = "0";
+					promoContainer.style.transform = "translateY(20px)";
+					setTimeout(() => {
+						promoContainer.classList.add("hidden");
+					}, 500);
+				}, 10000);
+			};
+
+			// Initial delay between 5 and 15 seconds
+			const initialDelay = Math.random() * (15000 - 5000) + 5000;
+
+			// Show first time after initial delay
+			setTimeout(() => {
+				showPromo();
+				// Then show every 30-60 seconds
+				setInterval(() => {
+					const intervalDelay =
+						Math.random() * (60000 - 30000) + 30000;
+					setTimeout(showPromo, intervalDelay);
+				}, 60000);
+			}, initialDelay);
+		</script>
 	</body>
 </html>

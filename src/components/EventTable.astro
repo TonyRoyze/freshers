@@ -35,11 +35,11 @@ const { data } = Astro.props;
                     class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Time</th
                 >
-                <th
+                <!-- <th
                     scope="col"
                     class="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
                     >Points</th
-                >
+                > -->
             </tr>
         </thead>
         <tbody class="[&_tr:last-child]:border-0">
@@ -63,14 +63,14 @@ const { data } = Astro.props;
                             {event.name}
                         </td>
                         <td class="md:hidden px-2 text-xs justify-center md:text-sm py-4 align-middle">
-                            {event.name.split(" ")[0]}
+                            {event.name.split(" ")[1]}
                         </td>
                         <td class="px-2 text-xs justify-center md:text-sm py-4 align-middle">
                             {event.time}
                         </td>
-                        <td class="px-3 py-4 text-xs md:text-sm md:px-3 md:text-sm align-middle">
+                        {/* <td class="px-3 py-4 text-xs md:text-sm md:px-3 md:text-sm align-middle">
                             {event.points ? event.points / 10 : "-"}
-                        </td>
+                        </td> */}
                     </tr>
                 ))
             }
