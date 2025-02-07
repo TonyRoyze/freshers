@@ -1,0 +1,105 @@
+---
+import tshirt from "../assets/tshirt.png";
+import { Image } from "astro:assets";
+---
+
+<div class="z-50">
+    <div id="fullPromo" class="z-50 max-w-md p-4 hidden">
+        <div
+            class="bg-[var(--color-muted)]/80 backdrop-blur-lg rounded-xl p-4 shadow-xl relative"
+        >
+            <!-- Add close button -->
+            <button
+                id="closePromo"
+                class="absolute -right-2 -top-2 bg-[var(--color-muted)] rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="flex flex-col gap-3">
+                <div class="w-full relative">
+                    <Image
+                        src={tshirt}
+                        alt="Oxygen is Overated T-Shirt"
+                        class="w-full h-40 object-contain rounded-lg"
+                    />
+                    <div
+                        class="absolute -right-2 -top-2 bg-yellow-400 text-black font-bold px-3 py-1 rounded-full transform rotate-12 shadow-lg"
+                    >
+                        Rs.1500
+                    </div>
+                </div>
+                <div class="flex-1 text-center">
+                    <h3 class="text-lg font-bold mb-1">
+                        Oxygen is Overated T-Shirt
+                    </h3>
+                    <div class="text-sm font-medium space-y-0.5">
+                        <p class="text-gray-500">GRAB IT ON 8TH FEB</p>
+                        <p>@ THURSTAN COLLEGE SWIMMING POOL</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div
+        id="compactPromo"
+        class="bg-[var(--color-muted)]/80 backdrop-blur-lg rounded-xl p-3 shadow-lg hover:scale-105 transition-transform cursor-pointer"
+    >
+        <div class="flex items-center justify-between">
+            <div class="relative flex flex-row items-center gap-3">
+                <Image
+                    src={tshirt}
+                    alt="T-Shirt"
+                    class="w-16 h-16 object-contain rounded-lg"
+                />
+                <div
+                    class="absolute -left-1 -top-1 bg-yellow-400 text-black text-xs font-bold px-1.5 py-0.5 rounded-full"
+                >
+                    1.5K
+                </div>
+                <div class="text-md">
+                    <p class="text-md font-bold">Get your T-shirt TODAY❗</p>
+                    <p class="text-xs">8th Feb @THURSTAN SWIMMING POOL</p>
+                </div>
+            </div>
+
+            <button id="seeMore" class="text-xs hover:underline mt-1"
+                >See more</button
+            >
+        </div>
+    </div>
+</div>
+
+<script>
+    const compactPromo = document.getElementById("compactPromo");
+    const fullPromo = document.getElementById("fullPromo");
+    const seeMore = document.getElementById("seeMore");
+    const closePromo = document.getElementById("closePromo");
+
+    // Hide full promo initially
+    fullPromo?.classList.add("hidden");
+
+    seeMore?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        compactPromo?.classList.add("hidden");
+        fullPromo?.classList.remove("hidden");
+    });
+
+    closePromo?.addEventListener("click", () => {
+        fullPromo?.classList.add("hidden");
+        compactPromo?.classList.remove("hidden");
+    });
+</script>

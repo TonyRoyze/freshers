@@ -1,0 +1,37 @@
+---
+import tshirt from "../assets/tshirt.png";
+import { Image } from "astro:assets";
+---
+
+<div class="z-50 max-w-md p-4">
+    <div
+        class="bg-[var(--color-muted)]/80 backdrop-blur-lg rounded-xl p-4 shadow-xl"
+    >
+        <div class="flex flex-col gap-3">
+            <div class="w-full relative">
+                <Image
+                    src={tshirt}
+                    alt="Oxygen is Overated T-Shirt"
+                    class="w-full h-40 object-contain rounded-lg"
+                />
+                <div
+                    class="absolute -right-2 -top-2 bg-yellow-400 text-black font-bold px-3 py-1 rounded-full transform rotate-12 shadow-lg"
+                >
+                    Rs.1500
+                </div>
+            </div>
+            <div class="flex-1 text-center">
+                <h3 class="text-lg font-bold mb-1">
+                    Oxygen is Overated T-Shirt
+                </h3>
+                <p class="text-xs mb-2 text-gray-200">
+                    Get your limited edition Freshers Championship t-shirt!
+                </p>
+                <div class="text-sm font-medium space-y-0.5">
+                    <p class="text-yellow-300">GRAB IT ON 8TH FEB</p>
+                    <p>THURSTAN COLLEGE SWIMMING POOL</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

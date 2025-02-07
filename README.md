@@ -32,3 +32,11 @@ npm run build
 # Preview production build
 npm run preview
 ```
+## 📄 License
+MIT
+
+## 🤝 Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 🌟 Support
+If you found this project helpful, please consider giving it a star on GitHub!

@@ -206,6 +206,9 @@ export const FACULTY_OPTIONS = [
     }, {
         id: 9,
         key: "SRI"
+    }, {
+        id: 10,
+        key: "FON"
     }
 ];
 
