@@ -85,7 +85,7 @@ const HeatTable = ({ results }) => {
                     {swimmer.name}
                   </td>
                   <td className="md:hidden px-2 text-sm py-4 align-middle">
-                    {swimmer.name.split(" ")[-1]}
+                    {swimmer.name.split(" ")[1]}
                   </td>
                 </tr>
               ))}
