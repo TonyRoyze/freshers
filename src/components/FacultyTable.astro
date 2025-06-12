@@ -5,7 +5,13 @@ interface Props {
     data: Points[];
 }
 
-const { data } = Astro.props;
+const { data: unsortedData } = Astro.props;
+const data = [...unsortedData]
+    .sort((a, b) => b.points - a.points)
+    .map((faculty, index) => ({
+        ...faculty,
+        rank: index + 1,
+    }));
 ---
 
 <div class="relative w-full overflow-auto">
@@ -52,7 +58,7 @@ const { data } = Astro.props;
                             </span>
                         </td>
                         <td class="px-4 py-4 text-xs md:text-sm md:px-4 md:text-sm align-middle">
-                            {faculty.points / 10}
+                            {faculty.points}
                         </td>
                     </tr>
                 ))
