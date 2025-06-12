@@ -1,12 +1,24 @@
 ---
-import { FACULTY_OPTIONS } from "../lib/constants";
-import type { Points, Event } from "../lib/types";
-import { supabase } from "../lib/supabase";
-let overallPoints: Points[] = [];
+const response = await fetch(
+    `https://opensheet.elk.sh/1Hww9j0A8B4cc24gzqDgK5alCsr5kG3nE1uYjSc9HiN0/1`,
+);
+const data = await response.json();
+
+const overallPoints = data
+    .map((item: any) => ({
+        name: item.Fclty,
+        points: Number(item.Overall) || 0,
+    }))
+    .sort((a: any, b: any) => b.points - a.points)
+    .map((item: any, index: number) => ({
+        ...item,
+        rank: index + 1,
+    }));
 
 interface EventArray {
     id: number;
     title: string;
+
     date: string;
     description: string;
     sport: string;
@@ -16,36 +28,13 @@ interface EventArray {
 const EVENTS: EventArray[] = [
     {
         id: 1,
-        title: "Freshers Swimming Championship",
+        title: "Inter Faculty Swimming Championship",
         date: "Feb 8",
         description: "Annual summer sports competition",
         sport: "Swimming",
         location: "Thurstan Swimming Pool",
     },
 ];
-
-const SPORTS = ["All", "Swimming"];
-
-const { data, error } = await supabase.from("swims").select("*");
-
-if (error) {
-    console.error("Error fetching events:", error);
-} else {
-    overallPoints = FACULTY_OPTIONS.map((faculty) => ({
-        name: faculty.key,
-        points: data
-            .filter((item) => item.faculty_id === faculty.id)
-            .reduce((sum, item) => sum + (item.points || 0), 0),
-    }))
-        .sort((a, b) => b.points - a.points)
-        .map((faculty, index, array) => ({
-            ...faculty,
-            rank:
-                index > 0 && faculty.points === array[index - 1].points
-                    ? (array[index - 1] as Points).rank
-                    : index + 1,
-        }));
-}
 ---
 
 <div class="flex flex-row items-stretch">
@@ -53,9 +42,9 @@ if (error) {
         <button
             id="filterButton"
             class="h-full p-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] hover:bg-gray-200 transition-colors"
-            aria-label="Select Sport"
+            aria-label="Event Leaderboard"
+            onclick="window.location.href='/'"
         >
-            <!-- <SlidersVertical className="w-6 h-6" /> -->
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -66,42 +55,13 @@ if (error) {
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="lucide lucide-sliders-vertical"
-                ><line x1="4" x2="4" y1="21" y2="14"></line><line
-                    x1="4"
-                    x2="4"
-                    y1="10"
-                    y2="3"></line><line x1="12" x2="12" y1="21" y2="12"
-                ></line><line x1="12" x2="12" y1="8" y2="3"></line><line
-                    x1="20"
-                    x2="20"
-                    y1="21"
-                    y2="16"></line><line x1="20" x2="20" y1="12" y2="3"
-                ></line><line x1="2" x2="6" y1="14" y2="14"></line><line
-                    x1="10"
-                    x2="14"
-                    y1="8"
-                    y2="8"></line><line x1="18" x2="22" y1="16" y2="16"
-                ></line></svg
+                class="lucide lucide-waves-ladder-icon lucide-waves-ladder"
+                ><path d="M19 5a2 2 0 0 0-2 2v11"></path><path
+                    d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"
+                ></path><path d="M7 13h10"></path><path d="M7 9h10"></path><path
+                    d="M9 5a2 2 0 0 0-2 2v11"></path></svg
             >
         </button>
-        <div
-            id="filterDropdown"
-            class="hidden absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-[var(--color-background)] ring-1 ring-black ring-opacity-5"
-        >
-            <ul class="py-1">
-                {
-                    SPORTS.map((sport) => (
-                        <li
-                            data-sport={sport}
-                            class="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-200"
-                        >
-                            {sport}
-                        </li>
-                    ))
-                }
-            </ul>
-        </div>
     </div>
 
     <div
@@ -113,7 +73,7 @@ if (error) {
         >
             {
                 EVENTS.map((event) => (
-                    <div class="relative flex-none w-full md:w-1/2 pr-2 snap-center">
+                    <div class="relative flex-none w-full pr-2 snap-center">
                         <a href="/">
                             <div class="bg-[var(--color-background)] p-6 pb-2 rounded-lg border border-[var(--color-border)] h-full">
                                 <p class="text-sm md:text-lg font-bold text-gray-800 mb-1">
@@ -255,10 +215,6 @@ if (error) {
     let currentIndex = 0;
     const cardsToShow = 3;
     const maxIndex = Math.max(0, EVENTS.length - cardsToShow);
-
-    filterButton?.addEventListener("click", () => {
-        filterDropdown?.classList.toggle("hidden");
-    });
 
     prevButton?.addEventListener("click", () => {
         currentIndex = Math.max(0, currentIndex - 1);
