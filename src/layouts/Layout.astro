@@ -5,7 +5,7 @@ import Image from "astro/components/Image.astro";
 import "../styles/global.css";
 import EventCarousel from "../components/EventCarousel.astro";
 
-import PromoCompact from "../components/PromoCompact.astro";
+// import PromoCompact from "../components/PromoCompact.astro";
 ---
 
 <!doctype html>
@@ -37,9 +37,9 @@ import PromoCompact from "../components/PromoCompact.astro";
             <!-- <Navigation /> -->
             <main class="min-h-dvh p-6 max-w-[1440px]">
                 <EventCarousel />
-                <div id="promoContainer" class="mt-2 w-full justify-center">
+                <!-- <div id="promoContainer" class="mt-2 w-full justify-center">
                     <PromoCompact />
-                </div>
+                </div> -->
                 <slot />
             </main>
             <footer
@@ -71,7 +71,7 @@ import PromoCompact from "../components/PromoCompact.astro";
                 </div>
             </footer>
         </div>
-        <script>
+        <!-- <script>
             const showPromo = () => {
                 const promoContainer =
                     document.getElementById("promoContainer");
@@ -112,6 +112,6 @@ import PromoCompact from "../components/PromoCompact.astro";
                     setTimeout(showPromo, intervalDelay);
                 }, 60000);
             }, initialDelay);
-        </script>
+        </script> -->
     </body>
 </html>
