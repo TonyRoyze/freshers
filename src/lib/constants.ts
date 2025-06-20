@@ -39,8 +39,8 @@ export const EVENT_OPTIONS = [
   {
     label: "Relay",
     items: [
-      { label: "4x25m Freestyle Relay", value: 16 },
-      { label: "4x25m Medley Relay", value: 17 },
+      { label: "4x50m Freestyle Relay", value: 16 },
+      { label: "4x50m Medley Relay", value: 17 },
     ],
   },
 ];
