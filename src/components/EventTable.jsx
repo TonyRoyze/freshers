@@ -1,6 +1,7 @@
 // import { FACULTY_OPTIONS } from "../lib/constants";
+const relay = [16, 17, 32, 33];
 
-export default function EventTable({ data }) {
+export default function EventTable({ data, eventNum }) {
   return (
     <div className="relative w-full overflow-auto">
       <table className="w-full caption-bottom text-xs">
@@ -18,12 +19,14 @@ export default function EventTable({ data }) {
             >
               Faculty
             </th>
-            <th
-              scope="col"
-              className="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
-            >
-              Name
-            </th>
+            {!relay.includes(eventNum) && (
+              <th
+                scope="col"
+                className="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+              >
+                Name
+              </th>
+            )}
             <th
               scope="col"
               className="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
@@ -35,7 +38,7 @@ export default function EventTable({ data }) {
         <tbody className="[&_tr:last-child]:border-0">
           {data.map(
             (event, index) =>
-              event.Name && (
+              event.Faculty && (
                 <tr
                   key={index}
                   className="border-[var(--color-border)] transition-colors hover:bg-[var(--color-background)]/50"
@@ -48,12 +51,16 @@ export default function EventTable({ data }) {
                       {event.Faculty}
                     </span>
                   </td>
-                  <td className="hidden md:table-cell px-2 text-xs justify-center md:text-sm py-4 align-middle">
-                    {event.Name}
-                  </td>
-                  <td className="md:hidden px-2 text-xs justify-center md:text-sm py-4 align-middle">
-                    {event.Name.split(" ")[0]}
-                  </td>
+                  {!relay.includes(eventNum) && (
+                    <td className="hidden md:table-cell px-2 text-xs justify-center md:text-sm py-4 align-middle">
+                      {event.Name}
+                    </td>
+                  )}
+                  {!relay.includes(eventNum) && (
+                    <td className="md:hidden px-2 text-xs justify-center md:text-sm py-4 align-middle">
+                      {event.Name.split(" ")[0]}
+                    </td>
+                  )}
                   <td className="px-2 text-xs justify-center md:text-sm py-4 align-middle">
                     {event.Timing}
                   </td>

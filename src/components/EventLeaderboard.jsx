@@ -32,6 +32,7 @@ export default function EventLeaderboard() {
         `https://opensheet.elk.sh/1Hww9j0A8B4cc24gzqDgK5alCsr5kG3nE1uYjSc9HiN0/${event}`,
       );
       const data = await response.json();
+      // console.log(data);
       setData(data);
     };
     fetchData();
@@ -39,7 +40,7 @@ export default function EventLeaderboard() {
 
   const selectedEventObject = EVENT_OPTIONS.flatMap(
     (group) => group.items,
-  ).find((item) => item.value === event % 16);
+  ).find((item) => item.value === event % 19);
 
   return (
     <div className="flex h-full flex-col rounded-xl bg-[var(--color-muted)]/60 p-4 md:col-span-2">
@@ -186,9 +187,12 @@ export default function EventLeaderboard() {
         </div>
 
         <div className="mt-4">
-          {}
-          {data && view === "table" && <EventTable data={data} />}
-          {data && view === "heats" && <HeatTable results={data} />}
+          {data && view === "table" && (
+            <EventTable data={data} eventNum={event} />
+          )}
+          {data && view === "heats" && (
+            <HeatTable results={data} eventNum={event} />
+          )}
         </div>
       </div>
     </div>
