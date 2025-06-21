@@ -40,7 +40,7 @@ export default function EventLeaderboard() {
 
   const selectedEventObject = EVENT_OPTIONS.flatMap(
     (group) => group.items,
-  ).find((item) => item.value === event % 19);
+  ).find((item) => item.value === event % 16);
 
   return (
     <div className="flex h-full flex-col rounded-xl bg-[var(--color-muted)]/60 p-4 md:col-span-2">
