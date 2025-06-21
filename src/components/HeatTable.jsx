@@ -1,6 +1,7 @@
 // import { FACULTY_OPTIONS } from "../lib/constants";
+const relay = [16, 17, 32, 33];
 
-const HeatTable = ({ results }) => {
+const HeatTable = ({ results, eventNum = 1 }) => {
   const validSwimmers = results.filter((s) => s.Heat !== "" && s.Lane !== "");
 
   const sortedSwimmers = [...validSwimmers].sort((a, b) => {
@@ -33,6 +34,8 @@ const HeatTable = ({ results }) => {
     });
   });
 
+  // console.log(eventNum, relay, relay.includes(eventNum));
+
   const heats = Array.from(heatsMap.values()).sort(
     (a, b) => parseInt(a.heatNumber, 10) - parseInt(b.heatNumber, 10),
   );
@@ -59,12 +62,14 @@ const HeatTable = ({ results }) => {
                 >
                   Faculty
                 </th>
-                <th
-                  scope="col"
-                  className="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
-                >
-                  Name
-                </th>
+                {!relay.includes(eventNum) && (
+                  <th
+                    scope="col"
+                    className="px-2 text-xs md:text-sm md:px-3 h-12 text-left align-middle font-medium text-[var(--color-muted-foreground)]"
+                  >
+                    Name
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
@@ -81,12 +86,16 @@ const HeatTable = ({ results }) => {
                       {swimmer.faculty}
                     </span>
                   </td>
-                  <td className="hidden md:table-cell px-2 text-sm py-4 align-middle">
-                    {swimmer.name}
-                  </td>
-                  <td className="md:hidden px-2 text-sm py-4 align-middle">
-                    {swimmer.name.split(" ")[1]}
-                  </td>
+                  {!relay.includes(eventNum) && (
+                    <td className="hidden md:table-cell px-2 text-xs justify-center md:text-sm py-4 align-middle">
+                      {swimmer.name}
+                    </td>
+                  )}
+                  {!relay.includes(eventNum) && (
+                    <td className="md:hidden px-2 text-xs justify-center md:text-sm py-4 align-middle">
+                      {swimmer.name.split(" ")[0]}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
