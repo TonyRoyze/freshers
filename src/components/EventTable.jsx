@@ -44,7 +44,7 @@ export default function EventTable({ data, eventNum }) {
                   className="border-[var(--color-border)] transition-colors hover:bg-[var(--color-background)]/50"
                 >
                   <td className="px-3 text-xs justify-center md:text-sm py-4 align-middle">
-                    {event.position}
+                    {event.Position}
                   </td>
                   <td className="px-2 md:px-3 py-4 align-middle">
                     <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 md:text-sm border-transparent bg-[var(--color-secondary)] text-secondary-foreground hover:bg-[var(--color-secondary)]/80">
